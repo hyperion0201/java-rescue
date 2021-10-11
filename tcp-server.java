@@ -1,48 +1,52 @@
-// Java Program to implement ServerSocket class
-// Server Side
-
-// Importing required libraries
 import java.io.*;
 import java.net.*;
 
-// Main class
-public class MyServer {
+public class TCPServer {
+    public static void main(String arg[]) {
+        try {
+            ServerSocket s = new ServerSocket(3200);
 
-	// Main driver method
-	public static void main(String[] args)
-	{
+            do {
+                System.out.println("Waiting for a Client");
 
-		// Try block to check for exceptions
-		try {
+                Socket ss = s.accept(); //synchronous
 
-			// Creating an object of ServerSocket class
-			// in the main() method for socket connection
-			ServerSocket ss = new ServerSocket(6666);
 
-			// Establishing a connection
-			Socket soc = ss.accept();
 
-			// Invoking input stream via getInputStream()
-			// method by creating DataInputStream class
-			// object
-			DataInputStream dis
-				= new DataInputStream(s.getInputStream());
+                System.out.println("Talking to client");
+                System.out.println(ss.getPort());
 
-			String str = (String)dis.readUTF();
+                InputStream is = ss.getInputStream();
+                BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-			// Display the string on the console
-			System.out.println("message= " + str);
+                OutputStream os = ss.getOutputStream();
+                BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
 
-			// Lastly close the socket using standard close
-			// method to release memory resources
-			ss.close();
-		}
 
-		// Catch block to handle the exceptions
-		catch (Exception e) {
+                String receivedMessage;
 
-			// Display the exception on the console
-			System.out.println(e);
-		}
-	}
+                do {
+                    receivedMessage = br.readLine();
+                    System.out.println("Received : " + receivedMessage);
+                    if (receivedMessage.equalsIgnoreCase("quit")) {
+                        System.out.println("Client has left !");
+                        break;
+                    } else {
+                        DataInputStream din = new DataInputStream(System.in);
+                        String k = din.readLine();
+                        bw.write(k);
+                        bw.newLine();
+                        bw.flush();
+                    }
+                }
+                while (true);
+                bw.close();
+                br.close();
+            }
+            while (true);
+
+        } catch (IOException e) {
+            System.out.println("There're some error");
+        }
+    }
 }
