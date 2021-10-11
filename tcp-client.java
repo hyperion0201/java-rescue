@@ -1,47 +1,44 @@
-// Java Program to implement ServerSocket class
-// Client - side
-
-// Importing required libraries
 import java.io.*;
 import java.net.*;
 
-// Main class
-public class MyClient {
+public class TCPClient {
+    public static void main(String arg[]) {
+        try {
+            Socket s = new Socket("localhost", 3200);
+            System.out.println(s.getPort());
 
-	// Main driver method
-	public static void main(String[] args)
-	{
+            InputStream is = s.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
-		// Try block to check if exception occurs
-		try {
+            OutputStream os = s.getOutputStream();
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(os));
 
-			// Creating Socket class object and
-			// initializing Socket
-			Socket soc = new Socket("localhost", 6666);
+            String sentMessage = "";
+            String receivedMessage;
 
-			DataOutputStream d = new DataOutputStream(
-				soc.getOutputStream());
+            System.out.println("Talking to Server");
 
-			// Message to be displayed
-			d.writeUTF("Hello GFG Readers!");
+            do {
+                DataInputStream din = new DataInputStream(System.in);
+                sentMessage = din.readLine();
+                bw.write(sentMessage);
+                bw.newLine();
+                bw.flush();
 
-			// Flushing out internal buffers,
-			// optimizing for better performance
-			d.flush();
+                if (sentMessage.equalsIgnoreCase("quit"))
+                    break;
+                else {
+                    receivedMessage = br.readLine();
+                    System.out.println("Received : " + receivedMessage);
+                }
 
-			// Closing the connections
+            }
+            while (true);
 
-			// Closing DataOutputStream
-			d.close();
-			// Closing socket
-			soc.close();
-		}
-
-		// Catch block to handle exceptions
-		catch (Exception e) {
-
-			// Print the exception on the console
-			System.out.println(e);
-		}
-	}
+            bw.close();
+            br.close();
+        } catch (IOException e) {
+            System.out.println("There're some error");
+        }
+    }
 }
